@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Capital23 Group — Secure Checkout</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body{margin:0;background:#f4f1e9;color:#20211d;font:15px system-ui,sans-serif}
+    main{max-width:560px;margin:6vh auto;padding:32px;background:#fffdf8;border:1px solid #ded8cb}
+    .mark{color:#b69a69;letter-spacing:.2em;font-size:11px}h1{font:normal 38px Georgia,serif;margin:12px 0}
+    p{color:#74736b;line-height:1.7;font-size:13px}#payment-element{margin:24px 0}
+    button{width:100%;padding:15px;background:#b69a69;color:#151510;border:0;text-transform:uppercase;letter-spacing:.13em;font-weight:700}
+    button:disabled{opacity:.5}#payment-message{margin-top:16px;font-size:13px}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="mark">CAPITAL23 GROUP LLC</div>
+    <h1>Secure checkout.</h1>
+    <p>Your payment details are collected securely by Stripe. Additional bank authentication may be requested when required.</p>
+    <form id="payment-form">
+      <div id="payment-element"></div>
+      <button id="submit-button" type="submit" disabled>Complete secure payment</button>
+      <div id="payment-message" role="status" aria-live="polite"></div>
+    </form>
+  </main>
+  <script>
+    // Inject these values from an authenticated server-rendered page.
+    window.C23_STRIPE_PUBLISHABLE_KEY = 'pk_test_REPLACE_ME';
+    window.C23_ORDER_ID = 'REPLACE_WITH_SERVER_CREATED_ORDER_ID';
+  </script>
+  <script src="/checkout.js"></script>
+</body>
+</html>
