@@ -1,33 +1,37 @@
-# Capital23 Group LLC — Stripe checkout starter
+# Capital23 Group LLC — free-first platform starter
 
-This is a starter implementation for a custom web checkout using Stripe Payment Element + PaymentIntents, with 3DS requested using `request_three_d_secure: 'any'`.
+This package combines the existing C23 storefront preview with a Cloudflare Worker backend scaffold for Stripe test mode and PayPal sandbox. It is **not deployed**, and the storefront preview remains a visual prototype until its checkout UI is wired to these endpoints.
 
-## Important status
+## Free-first hosting
 
-- This is source code, not a deployed application.
-- The storefront preview is a visual/demo prototype and does not process payments.
-- `findPendingOrder()` intentionally returns `null`; connect it to a real database and server-side catalog/pricing before testing payments.
-- `requireCustomer()` expects your real session middleware. Do not deploy the placeholder as authentication.
-- No live Stripe settings or charges have been changed or created.
+1. Create a free Cloudflare account and install Node.js on a computer.
+2. In this folder run `npm install`.
+3. Create a D1 database: `npx wrangler d1 create c23-orders`.
+4. Copy the returned database ID into `wrangler.jsonc`.
+5. Create the schema: `npx wrangler d1 execute c23-orders --local --file=./schema.sql` for local development, then repeat with `--remote` after the database is created remotely.
+6. Copy `.dev.vars.example` to `.dev.vars` and fill it with TEST/SANDBOX credentials only. Do not upload or share secret keys in chat.
+7. Run `npm run dev` for local testing. Deploy only after the app is fully reviewed with `npm run deploy`.
 
-## Run locally
+Cloudflare's free tier has usage limits. The current plan lists up to 100,000 Worker requests per day and 10 ms CPU time per invocation; verify current limits before production use.
 
-1. Install Node.js 20+.
-2. Copy `.env.example` to `.env` and add Stripe **test-mode** keys.
-3. Run `npm install`.
-4. Implement `findPendingOrder()` and `requireCustomer()` using your database and authentication system.
-5. Run `npm run dev`.
-6. Serve `checkout.html` and `checkout.js` from the same HTTPS origin as the API. Inject the publishable key and a server-created order ID into the page.
-7. Forward Stripe test webhooks to `/stripe-webhook` using the Stripe CLI and set the resulting signing secret in `.env`.
+## Important payment safety notes
 
-## Before production
+- This scaffold deliberately rejects live Stripe keys and PayPal live mode.
+- The server calculates amounts from its own allow-listed catalog. It does not trust prices sent by the browser.
+- The listed prices are illustrative placeholders from the existing visual preview, **not approved C23 prices**. Replace the `CATALOG` map with the actual approved Stripe catalog before any live use.
+- The Property Turnover quote item is intentionally excluded from direct checkout until a quote is approved.
+- Stripe success is recorded from a signature-verified `payment_intent.succeeded` webhook, not a browser redirect.
+- PayPal capture is performed server-side and checked for `COMPLETED` status.
+- This is a starter, not a complete production system. Before accepting live payments, add customer authentication/authorization for client-specific invoices, stronger order-state controls, webhook reconciliation and monitoring, rate limiting/abuse protection, privacy and refund policies, and tested idempotency/retry handling.
+- No live payment has been created, and no Stripe or PayPal account settings have been changed.
 
-- Persist orders, PaymentIntent IDs and webhook event IDs in a database.
-- Make order creation, payment intent association, and fulfillment idempotent/transactional.
-- Verify order ownership, amount, currency, inventory, discounts and tax server-side.
-- Add CSRF protection for cookie sessions, secure cookies, origin checks, monitoring, error reporting and retry-safe webhook processing.
-- Configure HTTPS, allowed origins, CSP and deployment secrets.
-- Test successful, declined, 3DS challenge, abandoned, duplicate webhook and retry flows in Stripe test mode.
-- Fulfill only after a verified `payment_intent.succeeded` webhook and server-side reconciliation.
+## Endpoints
 
-Stripe 3DS behavior is issuer/network/risk dependent. `any` requests 3DS when supported and applicable; it does not guarantee an interactive challenge on every payment.
+- `POST /api/stripe/payment-intent` — creates a Stripe test PaymentIntent for allow-listed items.
+- `POST /api/stripe/webhook` — verifies Stripe webhook signatures and records successful payments.
+- `POST /api/paypal/orders` — creates a PayPal sandbox order.
+- `POST /api/paypal/orders/:id/capture` — captures a sandbox order server-side.
+
+## Next integration step
+
+Wire the storefront bag to send item IDs and quantities to these endpoints, render Stripe Payment Element using the returned client secret, and render PayPal's JavaScript SDK button using the returned PayPal order ID. The front end must never send an authoritative amount or mark an order paid by itself.

@@ -1,14 +1,8 @@
 {
-  "name": "capital23-stripe-checkout-starter",
-  "version": "1.0.0",
+  "name": "capital23-group-free-platform",
   "private": true,
+  "version": "1.0.0",
   "type": "module",
-  "scripts": { "start": "node server.js", "dev": "node --watch server.js" },
-  "dependencies": {
-    "dotenv": "^16.4.5",
-    "express": "^4.21.2",
-    "express-rate-limit": "^7.5.0",
-    "helmet": "^8.0.0",
-    "stripe": "^17.5.0"
-  }
+  "scripts": { "dev": "wrangler dev", "deploy": "wrangler deploy" },
+  "devDependencies": { "wrangler": "^4.0.0" }
 }

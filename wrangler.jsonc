@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "capital23-group",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "c23-orders", "database_id": "REPLACE_AFTER_CREATING_D1" }
+  ],
+  "vars": { "PAYPAL_ENV": "sandbox", "PAYMENT_MODE": "test" }
+}
